@@ -1,58 +1,172 @@
-/*----------------Inicio del simulador interactivo le pedimos al usuario que ingrese los productos que va a comprar----*/
+const zapatilla = document.getElementById("zapatilla");
+const verCarrito = document.getElementById("verCarrito");
+const modalContainer = document.getElementById("modal-container");
+const cantidadCarrito = document.getElementById("cantidadCarrito");
 
-let productos = parseInt(prompt("Ingrese el numero de productos a comprar "));
-alert(`Usted va a comprar ${productos} productos `);
-/* Declaramos dos arrays vaciuos en el primero le pedimos al usuario que ingrese las marcas seleccionadas en la compra 
-y se las mostramos   */
-
-const arrayProductos = [];
-const arrayPrecios = [];
-
-for (let i = 0; i <= productos - 1; i++) {
-  arrayProductos.push(
-    prompt(
-      "Ingrese las marcas de las zapatillas a comprar Adidas , Nike , Puma "
-    )
-  );
+// Formatiar precio
+function formatearPrecio(precio) {
+  const moneda = "$";
+  const precioAux = formatiar.format(precio);
+  return moneda.concat(precioAux);
 }
-alert(`usted selecciono estas marcas ${arrayProductos}`);
 
-/* Le pedimos al usuario que ingrese el precio de los productos que selecciono y se los mostramos  */
-
-for (let i = 0; i <= arrayProductos.length - 1; i++) {
-  arrayPrecios.push(
-    parseInt(prompt("Ingrese los precios de las zapatillas que selecciono:  "))
-  );
-}
-alert(`los precios ingresados son  ${arrayPrecios}`);
-
-/*Declaramos  la variable totalCompra donde acumulamos el total de los productos con el metodo reduce de los array*/
-
-const totalCompra = arrayPrecios.reduce((acc, item) => {
-  return (acc = acc + item);
+const formatiar = new Intl.NumberFormat({
+  style: "currency",
+  currency: "USD",
 });
-alert(`El total de la compra es  : $ ${totalCompra}`);
 
-/*declaramos la varieble kilometros para calcular el costo del flete */
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
-let kilometros = parseFloat(
-  prompt(
-    "Ingrese la cantidad de kilometros Hasta su domicilio minimo 1 km maximo 20 km : "
-  )
-);
-/* Funcion para calcular el costo el flete deacuerdo a la cantidad de kilometros ingresados por el usuario  */
+productos.forEach((e) => {
+  let content = document.createElement("div");
+  content.className = "card";
+  content.innerHTML = `
+  <img src="${e.img}"/> 
+  <h3>${e.nombre}</h3>
+  <p class="precio" >${formatearPrecio(e.precio)}</p>
+  `;
+  zapatilla.append(content);
 
-const calcularFlete = () => {
-  if (kilometros <= 0) {
-    alert(
-      "No ingreso ninguna distancia para el calculo del flete , debe volver a cargar todo el pedido "
-    );
-  } else if (kilometros <= 15) {
-    alert("el costo del flete es de $1500 ");
-  } else if (kilometros <= 20) {
-    alert("el costo del flete es de $2000");
-  }
+  /*---------------------Añadimos el boton y logica de compra-----------------------------*/
+  let comprar = document.createElement("button");
+  comprar.innerText = "Comprar";
+  comprar.className = "comprar";
+  content.append(comprar);
+  comprar.addEventListener("click", () => {
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Esta seguro de añadir el producto?",
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Si",
+      cancelButtonText: `Cancelar`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        const repetido = carrito.some((el) => el.id === e.id);
+        if (repetido) {
+          carrito.map((element) => {
+            if (element.id === e.id) {
+              element.cantidad++;
+            }
+          });
+        } else {
+          carrito.push({
+            id: e.id,
+            img: e.img,
+            nombre: e.nombre,
+            precio: e.precio,
+            cantidad: e.cantidad,
+          });
+          mostrarCantidad();
+          guardarLocal();
+        }
+      } else if (result.isDenied) {
+        Swal.fire("no se guardo", "", "info");
+      }
+    });
+  });
+});
+
+/*-----------------------------------Codigo para ver el carrito---------------------------------*/
+const mostrarCarrito = () => {
+  modalContainer.innerHTML = "";
+  modalContainer.style.display = "flex";
+  const modalHeader = document.createElement("div");
+  modalHeader.className = "modalHeader";
+  modalHeader.innerHTML = `
+   <h1 class="modalHeaderTitle" >Carrito</h1>
+   `;
+  modalContainer.append(modalHeader);
+  const modalButton = document.createElement("h1");
+  modalButton.innerText = "X";
+  modalButton.className = "modalBoton";
+  modalHeader.append(modalButton);
+  modalButton.addEventListener("click", () => {
+    modalContainer.style.display = "none";
+  });
+  /*--------------------------------------------------contruimos el carrito------------------------------------------------------------------*/
+  carrito.forEach((e) => {
+    let carritoContent = document.createElement("div");
+    carritoContent.className = "modalContent";
+    carritoContent.innerHTML = `
+    <img src="${e.img}"/>
+    <h3>${e.nombre}</h3>
+    <p>${e.precio}</p>
+    <button class="restar" >➖</button>
+    <p> Cantidad : ${e.cantidad}</p>
+    <button class="sumar" >➕</button>
+    <p>Total $ ${e.cantidad * e.precio}</p>
+    <button class="eliminarProducto" >🗑</button>
+    `;
+    modalContainer.append(carritoContent);
+    /*------------------------------------------Botones para sumar u restar en el carrito------------------------------------------------*/
+    let restar = carritoContent.querySelector(".restar");
+    restar.addEventListener("click", () => {
+      if (e.cantidad !== 1) {
+        e.cantidad--;
+      }
+      guardarLocal();
+      mostrarCarrito();
+    });
+
+    let sumar = carritoContent.querySelector(".sumar");
+    sumar.addEventListener("click", () => {
+      e.cantidad++;
+
+      guardarLocal();
+      mostrarCarrito();
+    });
+
+    /*------------------------------------------------------Eliminar productos del carritp---------------------------------------------------------*/
+    let eliminar = carritoContent.querySelector(".eliminarProducto");
+    eliminar.addEventListener("click", () => {
+      eliminarProducto(e.id);
+    });
+  });
+  const total = carrito.reduce((acc, el) => acc + el.precio * el.cantidad, 0);
+
+  let totalCompra = document.createElement("div");
+  totalCompra.className = "totalContent";
+  totalCompra.innerHTML = `<h3>El total a Pagar es: $ ${total} </h3>`;
+  modalContainer.append(totalCompra);
+
+  let finalizar = document.createElement("div");
+  finalizar.className = "finalizar";
+  finalizar.innerHTML = `<button class="fin" >Finalizar</button>`;
+  modalContainer.append(finalizar);
+  let finalCompra = modalContainer.querySelector(".finalizar");
+  finalCompra.addEventListener("click", () => {
+    Swal.fire("Su compra se la procesado con exito");
+    carrito = [];
+    guardarLocal();
+    mostrarCarrito();
+    mostrarCantidad();
+    modalContainer.style.display = "none";
+  });
 };
-calcularFlete();
 
-alert("Se proceso su pedido , sera enviado dentor de los tres dias habiles ");
+verCarrito.addEventListener("click", mostrarCarrito);
+const eliminarProducto = (ida) => {
+  const id = carrito.find((el) => el.id === ida);
+  carrito = carrito.filter((el) => {
+    return el !== id;
+  });
+  mostrarCantidad();
+  guardarLocal();
+  mostrarCarrito();
+};
+/*------------------------------------------------- mostrar la cantidad de productos en el carrito------------------------- */
+const mostrarCantidad = () => {
+  cantidadCarrito.style.display = "block";
+  const carritoLength = carrito.length;
+  localStorage.setItem("carritolength", JSON.stringify(carritoLength));
+  cantidadCarrito.innerText = JSON.parse(localStorage.getItem("carritolength"));
+};
+
+/*-------------------------------agregar persistencia e datos con Local storage-------------------------------------------*/
+const guardarLocal = () => {
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+};
+mostrarCantidad();
