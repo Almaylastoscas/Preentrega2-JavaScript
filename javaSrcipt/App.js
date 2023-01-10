@@ -16,58 +16,73 @@ const formatiar = new Intl.NumberFormat({
 });
 
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+/*--------------------------------------------------------Get de productos desde archivo JSON----------------------------------------------------------------------------*/
+const obtenerProductos = async () => {
+  const response = await fetch("../json/productos.json");
+  const data = await response.json();
 
-productos.forEach((e) => {
-  let content = document.createElement("div");
-  content.className = "card";
-  content.innerHTML = `
-  <img src="${e.img}"/> 
-  <h3>${e.nombre}</h3>
-  <p class="precio" >${formatearPrecio(e.precio)}</p>
-  `;
-  zapatilla.append(content);
+  return data;
+};
 
-  /*---------------------Añadimos el boton y logica de compra-----------------------------*/
-  let comprar = document.createElement("button");
-  comprar.innerText = "Comprar";
-  comprar.className = "comprar";
-  content.append(comprar);
-  comprar.addEventListener("click", () => {
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Esta seguro de añadir el producto?",
-      showConfirmButton: true,
-      showCancelButton: true,
-      confirmButtonText: "Si",
-      cancelButtonText: `Cancelar`,
-    }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
-      if (result.isConfirmed) {
-        const repetido = carrito.some((el) => el.id === e.id);
-        if (repetido) {
-          carrito.map((element) => {
-            if (element.id === e.id) {
-              element.cantidad++;
+const renderProductos = () => {
+  obtenerProductos().then((response) => {
+    let productos = response;
+    // aca puedo renderizar los productos
+    productos.forEach((e) => {
+      let content = document.createElement("div");
+      content.className = "card";
+      content.innerHTML = `
+      <img src="${e.img}"/> 
+      <h3>${e.nombre}</h3>
+      <p class="precio" >${formatearPrecio(e.precio)}</p>
+      `;
+      zapatilla.append(content);
+
+      let comprar = document.createElement("button");
+      comprar.innerText = "Comprar";
+      comprar.className = "comprar";
+      content.append(comprar);
+      comprar.addEventListener("click", () => {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Esta seguro de añadir el producto?",
+          showConfirmButton: true,
+          showCancelButton: true,
+          confirmButtonText: "Si",
+          cancelButtonText: `Cancelar`,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const repetido = carrito.some((el) => el.id === e.id);
+            if (repetido) {
+              carrito.map((element) => {
+                if (element.id === e.id) {
+                  element.cantidad++;
+                }
+              });
+            } else {
+              carrito.push({
+                id: e.id,
+                img: e.img,
+                nombre: e.nombre,
+                precio: e.precio,
+                cantidad: e.cantidad,
+              });
+              mostrarCantidad();
+              guardarLocal();
             }
-          });
-        } else {
-          carrito.push({
-            id: e.id,
-            img: e.img,
-            nombre: e.nombre,
-            precio: e.precio,
-            cantidad: e.cantidad,
-          });
-          mostrarCantidad();
-          guardarLocal();
-        }
-      } else if (result.isDenied) {
-        Swal.fire("no se guardo", "", "info");
-      }
+          } else if (result.isDenied) {
+            Swal.fire("no se guardo", "", "info");
+          }
+        });
+      });
     });
   });
-});
+};
+renderProductos();
+/*fetch("../json/productos.json")
+  .then((res) => res.json())
+  .then((json) => console.log(json));*/
 
 /*-----------------------------------Codigo para ver el carrito---------------------------------*/
 const mostrarCarrito = () => {
