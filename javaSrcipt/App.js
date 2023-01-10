@@ -80,9 +80,6 @@ const renderProductos = () => {
   });
 };
 renderProductos();
-/*fetch("../json/productos.json")
-  .then((res) => res.json())
-  .then((json) => console.log(json));*/
 
 /*-----------------------------------Codigo para ver el carrito---------------------------------*/
 const mostrarCarrito = () => {
@@ -149,7 +146,7 @@ const mostrarCarrito = () => {
 
   let finalizar = document.createElement("div");
   finalizar.className = "finalizar";
-  finalizar.innerHTML = `<button class="fin" >Finalizar</button>`;
+  finalizar.innerHTML = `<button class="fin" >Confirmar </button>`;
   modalContainer.append(finalizar);
   let finalCompra = modalContainer.querySelector(".finalizar");
   finalCompra.addEventListener("click", () => {
