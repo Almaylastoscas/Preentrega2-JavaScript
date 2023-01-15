@@ -45,7 +45,7 @@ const renderProductos = () => {
       comprar.addEventListener("click", () => {
         Swal.fire({
           position: "center",
-          icon: "success",
+          icon: "question",
           title: "Esta seguro de añadir el producto?",
           showConfirmButton: true,
           showCancelButton: true,
@@ -111,6 +111,7 @@ const mostrarCarrito = () => {
     <button class="sumar" >➕</button>
     <p>Total $ ${e.cantidad * e.precio}</p>
     <button class="eliminarProducto" >🗑</button>
+    
     `;
     modalContainer.append(carritoContent);
     /*------------------------------------------Botones para sumar u restar en el carrito------------------------------------------------*/
@@ -143,19 +144,43 @@ const mostrarCarrito = () => {
   totalCompra.className = "totalContent";
   totalCompra.innerHTML = `<h3>El total a Pagar es: $ ${total} </h3>`;
   modalContainer.append(totalCompra);
-
-  let finalizar = document.createElement("div");
-  finalizar.className = "finalizar";
-  finalizar.innerHTML = `<button class="fin" >Confirmar </button>`;
-  modalContainer.append(finalizar);
-  let finalCompra = modalContainer.querySelector(".finalizar");
-  finalCompra.addEventListener("click", () => {
-    Swal.fire("Su compra se la procesado con exito");
+  /*-------------------------------Boton para vaciar el carrito----------------------------------------------*/
+  let vaciarCarrito = document.createElement("div");
+  vaciarCarrito.className = "vaciar";
+  vaciarCarrito.innerHTML = `<button class="vaciar" >Vaciar Carrito </button>`;
+  modalContainer.append(vaciarCarrito);
+  let vaciarCompra = modalContainer.querySelector(".vaciar");
+  vaciarCompra.addEventListener("click", () => {
+    Swal.fire({ icon: "success", title: " El carrito se a vaciado con exito" });
     carrito = [];
     guardarLocal();
     mostrarCarrito();
     mostrarCantidad();
-    modalContainer.style.display = "none";
+  });
+  /*---------------------------------------------------Boton para finalizar Compra----------------------------------------*/
+  let finalizar = document.createElement("div");
+  finalizar.className = "finalizar";
+  finalizar.innerHTML = `<button class="fin" >Confirmar</button>`;
+  modalContainer.append(finalizar);
+  let finalCompra = modalContainer.querySelector(".finalizar");
+  finalCompra.addEventListener("click", () => {
+    if (carrito.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title:
+          "No hay ningun pruducto en el carrito, Seleccione el producto a Comprar",
+      });
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: "Su compra se la procesado con exito",
+      });
+      carrito = [];
+      guardarLocal();
+      mostrarCarrito();
+      mostrarCantidad();
+      modalContainer.style.display = "none";
+    }
   });
 };
 
