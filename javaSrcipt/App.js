@@ -151,11 +151,21 @@ const mostrarCarrito = () => {
   modalContainer.append(vaciarCarrito);
   let vaciarCompra = modalContainer.querySelector(".vaciar");
   vaciarCompra.addEventListener("click", () => {
-    Swal.fire({ icon: "success", title: " El carrito se a vaciado con exito" });
-    carrito = [];
-    guardarLocal();
-    mostrarCarrito();
-    mostrarCantidad();
+    if (carrito.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: " No hay ningun producto en el carrito",
+      });
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: " El carrito se a vaciado con exito",
+      });
+      carrito = [];
+      guardarLocal();
+      mostrarCarrito();
+      mostrarCantidad();
+    }
   });
   /*---------------------------------------------------Boton para finalizar Compra----------------------------------------*/
   let finalizar = document.createElement("div");
