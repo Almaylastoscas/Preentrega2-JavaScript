@@ -167,6 +167,7 @@ const mostrarCarrito = () => {
       mostrarCantidad();
     }
   });
+
   /*---------------------------------------------------Boton para finalizar Compra----------------------------------------*/
   let finalizar = document.createElement("div");
   finalizar.className = "finalizar";
@@ -183,7 +184,7 @@ const mostrarCarrito = () => {
     } else {
       Swal.fire({
         icon: "success",
-        title: "Su compra se la procesado con exito",
+        title: "Su compra se ha procesado con exito",
       });
       carrito = [];
       guardarLocal();
