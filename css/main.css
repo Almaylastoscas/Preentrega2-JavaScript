@@ -41,6 +41,10 @@ body {
   padding: 15% 0;
   box-shadow: 8px #1b1b1b;
 }
+.tamaño {
+  font-size: 60px;
+  text-shadow: 0ch;
+}
 
 .title {
   text-align: center;
