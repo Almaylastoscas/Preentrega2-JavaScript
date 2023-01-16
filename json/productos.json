@@ -59,7 +59,7 @@
     "id": 9,
     "nombre": "Zapatilla Nike pro Future",
     "precio": 5900,
-    "img": "./imagenes/img09.jpg",
+    "img": "../imagenes/img09.jpg",
     "cantidad": 1
   }
 ]
