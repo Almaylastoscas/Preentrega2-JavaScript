@@ -18,7 +18,7 @@ const formatiar = new Intl.NumberFormat({
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 /*--------------------------------------------------------Get de productos desde archivo JSON----------------------------------------------------------------------------*/
 const obtenerProductos = async () => {
-  const response = await fetch("../json/productos.json");
+  const response = await fetch("/json/productos.json");
   const data = await response.json();
 
   return data;
