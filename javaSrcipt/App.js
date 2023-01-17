@@ -103,8 +103,8 @@ const mostrarCarrito = () => {
     let carritoContent = document.createElement("div");
     carritoContent.className = "modalContent";
     carritoContent.innerHTML = `
-    <img src="${e.img}"/>
-    <h3>${e.nombre}</h3>
+    <img class="imgCarrito" src="${e.img}"/>
+    <h3 class="sacar">${e.nombre}</h3>
     <p>${e.precio}</p>
     <button class="restar" >➖</button>
     <p> Cantidad : ${e.cantidad}</p>

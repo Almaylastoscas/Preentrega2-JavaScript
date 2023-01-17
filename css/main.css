@@ -196,3 +196,13 @@ body {
   font-size: 20px;
   margin-bottom: 15px;
 }
+@media all and (max-width: 1200px) {
+  .sacar {
+    display: none;
+  }
+}
+@media all and (max-width: 770px) {
+  .imgCarrito {
+    display: none;
+  }
+}
